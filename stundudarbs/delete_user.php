@@ -1,7 +1,14 @@
-<?php
+<?php 
 // delete_user.php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name = $_POST['name'];
+    // Retrieve the user ID from the POST request
+    $userId = $_POST['userId'];
+
+    // Check if userId is present
+    if (empty($userId)) {
+        echo "Error: No user ID provided.";
+        exit();
+    }
 
     // Connect to the database
     $conn = new mysqli('localhost', 'root', '', 'user_management');
@@ -11,18 +18,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die("Connection failed: " . $conn->connect_error);
     }
 
-    // Prevent SQL injection
-    $name = $conn->real_escape_string($name);
+    // Prepare the SQL DELETE query using the user ID
+    $userId = (int)$conn->real_escape_string($userId); // Casting to int for safety
+    $sql = "DELETE FROM users WHERE id = $userId";
 
-    // Delete user from the database
-    $sql = "DELETE FROM users WHERE CONCAT(first_name, ' ', last_name) = '$name'";
-
+    // Execute the query
     if ($conn->query($sql) === TRUE) {
         echo "success";
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
 
+    // Close the database connection
     $conn->close();
 }
 ?>
+

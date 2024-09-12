@@ -35,8 +35,8 @@
 
         /* Container-specific styles */
         #container1 {
-            width: 87%; /* Ensure it takes up the full width of its cell */
-            height: 85%; /* Ensure it takes up the full height of its cell */
+            width: 100%; /* Ensure it takes up the full width of its cell */
+            height: 100%; /* Ensure it takes up the full height of its cell */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -44,8 +44,8 @@
         }
 
         #container1 img {
-            max-height: calc(100% - 30px); /* Make the image slightly smaller in height */
-            max-width: calc(100% - 50px); /* Make the image slightly smaller in width */
+            max-height: 90%; /* Make the image slightly smaller in height */
+            max-width: 90%; /* Make the image slightly smaller in width */
             object-fit: contain; /* Maintain aspect ratio and fit within the container */
             cursor: pointer;
         }
@@ -132,7 +132,7 @@
     </style>
 </head>
 <body>
-    <table>
+    <table id="rotatingTable">
         <tr>
             <!-- Container 1: VTDT Background with Large Image -->
             <td id="container1">
@@ -219,21 +219,49 @@
                 </div>
             </td>
 
-            <!-- Container 9: Delete User Form -->
             <td id="container9">
                 <h3>Delete User</h3>
                 <form id="deleteUserForm">
-                    <input type="text" name="name" placeholder="Full Name (First Last)" required><br><br>
+                    <label for="deleteUserSelect">Select User to Delete:</label><br>
+                    <select id="deleteUserSelect" name="userId" required>
+                        <option value="">Select a user</option>
+                        <?php
+                        // Connect to the database
+                        $conn = new mysqli('localhost', 'root', '', 'user_management');
+
+                        // Check connection
+                        if ($conn->connect_error) {
+                            die("Connection failed: " . $conn->connect_error);
+                        }
+
+                        // Fetch users
+                        $sql = "SELECT id, first_name, last_name FROM users";
+                        $result = $conn->query($sql);
+
+                        if ($result->num_rows > 0) {
+                            // Create dropdown options for each user
+                            while($row = $result->fetch_assoc()) {
+                                echo "<option value='{$row['id']}'>{$row['first_name']} {$row['last_name']}</option>";
+                            }
+                        } else {
+                            echo "<option value=''>No users available</option>";
+                        }
+
+                        $conn->close();
+                        ?>
+                    </select><br><br>
                     <button type="submit">Delete</button>
                 </form>
             </td>
         </tr>
-    </table>
+        </tr>
 
     <!-- Modal for Full-Screen Image -->
     <div id="imageModal">
         <span class="close" onclick="closeModal()">&times;</span>
         <img id="modalImage" src="vtdt.png">
     </div>
-    </body>
+
+    <script src="script.js"></script>
+</body>
 </html>
